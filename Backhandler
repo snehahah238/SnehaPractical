@@ -1,0 +1,191 @@
+
+import React, { Component } from 'react';
+import {Dimensions,Animated, Alert, BackHandler, DeviceEventEmitter, AsyncStorage, StatusBar, TouchableOpacity, TextInput, SafeAreaView, ScrollView, StyleSheet, Image, Text, View } from 'react-native';
+
+import {
+    widthPercentageToDP as wp,
+    heightPercentageToDP as hp,
+    listenOrientationChange as loc,
+    removeOrientationListener as rol
+} from 'react-native-responsive-screen';
+
+
+import styles from './styles/Styles';
+
+import Toast from 'react-native-simple-toast';
+
+import { StackActions, NavigationActions } from 'react-navigation';
+
+let {width, height} = Dimensions.get('window');
+
+
+export default class Admin extends Component {
+
+    _didFocusSubscription;
+    _willBlurSubscription;
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            backClickCount: 0
+        }
+        //this.springValue = new Animated.Value(100);
+        global.backpresss = '',
+        global.classref = this;
+
+        this._didFocusSubscription = props.navigation.addListener('didFocus', payload =>
+        BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+    );
+    }
+
+
+    componentDidMount() {
+        loc(this);
+        this._willBlurSubscription = this.props.navigation.addListener('willBlur', payload =>
+        BackHandler.removeEventListener('hardwareBackPress', this.onBackButtonPressAndroid)
+      );
+    }
+
+
+    onBackButtonPressAndroid = () => {
+        if (this.state.doubleBackToExitPressedOnce) {
+            BackHandler.exitApp();
+      
+        }
+        Toast.show("Double Tap to Exit");
+        this.setState({ doubleBackToExitPressedOnce: true });
+        setTimeout(() => {
+            this.setState({ doubleBackToExitPressedOnce: false });
+        }, 2000);
+        return true;
+      };
+
+    componentWillMount() {
+    }
+
+    componentWillUnMount() {
+        rol();
+        this._didFocusSubscription && this._didFocusSubscription.remove();
+        this._willBlurSubscription && this._willBlurSubscription.remove();
+    }
+
+
+    
+    render() {
+
+        var { navigate } = this.props.navigation;
+
+        return (
+            <SafeAreaView style={styles.Admincontainer}>
+
+                <StatusBar
+                    barStyle="dark-content"
+                    // dark-content, light-content and default
+                    hidden={false}
+                    //To hide statusBar
+                    backgroundColor="#FFFFFF"
+                    //Background color of statusBar only works for Android
+                    translucent={false}
+                    //allowing light, but not detailed shapes
+                    networkActivityIndicatorVisible={true}
+                />
+
+                <View style={{
+                    flexDirection: 'row', marginTop: hp('2%'), justifyContent: 'center', alignItems: 'center'
+                }}>
+
+                    <Image source={require('./Images/logo.png')} style={{ height: hp('6%'), width: wp('30%'), resizeMode: 'stretch' }} />
+
+                </View>
+
+                <Image resizeMode="cover" source={require('./Images/outdoor2.png')} style={styles.AdminImage}>
+
+                </Image>
+
+                <Text style={{ position: 'absolute', fontWeight: 'bold', top: hp('11%'), left: wp('5%'), fontSize: wp('6%'), color: '#FFFFFF' }}>OUTDOOR WORK</Text>
+
+                <TouchableOpacity onPress={() => {
+
+                    navigate('Checkin', { user: 'CheckIn'})
+
+                }} style={{ position: 'absolute', top: hp('16%'), left: wp('7%'), }}>
+                    <Text style={{ fontSize: wp('5%'), color: '#00788E' }}>- Check In/ Out</Text>
+                </TouchableOpacity>
+
+                <Image resizeMode="cover" source={require('./Images/leave.png')} style={styles.AdminImageBelow}>
+
+                </Image>
+
+                <Text style={{ position: 'absolute', fontWeight: 'bold', top: hp('37%'), left: wp('5%'), fontSize: wp('6%'), color: '#FFFFFF' }}>LEAVE</Text>
+
+                <TouchableOpacity onPress={() => {
+
+                    navigate('Routes',{ user: 'Enquiry' })
+
+
+                }} style={{ position: 'absolute', top: hp('42.5%'), left: wp('7%'), }}>
+                    <Text style={{ fontSize: wp('5%'), color: '#C0CFE2' }}>-Enquiry</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+
+                    AsyncStorage.setItem("title", "Balance");
+
+                    navigate('Routes', { user: 'Balance' })
+
+                }} style={{ position: 'absolute', top: hp('46%'), left: wp('7%'), }}>
+                    <Text style={{ fontSize: wp('5%'), color: '#C0CFE2' }}>-Balance History</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+
+                    navigate('Routes', { user: 'New' })
+
+                }} style={{ position: 'absolute', top: hp('49.5%'), left: wp('7%'), }}>
+                    <Text style={{ fontSize: wp('5%'), color: '#C0CFE2' }}>-New Leave application</Text>
+                </TouchableOpacity>
+
+                <Image resizeMode="cover" source={require('./Images/light.png')} style={styles.AdminImageBelow}>
+
+                </Image>
+
+                <Text style={{ position: 'absolute', fontWeight: 'bold', top: hp('63%'), left: wp('5%'), fontSize: wp('6%'), color: '#FFFFFF' }}>APPROVAL</Text>
+
+                <TouchableOpacity onPress={() => {
+                    navigate('Approval', {})
+
+                }} style={{ position: 'absolute', top: hp('68.5%'), left: wp('7%'), }}>
+                    <Text style={{ fontSize: wp('5%'), color: '#C0CFE2' }}>-Approve/reject application</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => {
+                    navigate('Login', {})
+
+                }} style={{ position: 'absolute', top: hp('72%'), left: wp('7%'), }}>
+                    <Text style={{ fontSize: wp('5%'), color: '#C0CFE2' }}>-Application Status</Text>
+                </TouchableOpacity>
+
+
+                <TouchableOpacity onPress={() => {
+
+                    navigate('Staff', {})
+
+                }} style={{ flexDirection: 'row', position: 'absolute', bottom: hp('3%'), right: '4%' }}>
+
+                    <Text style={{ alignSelf: 'center', color: '#58C3D7', fontSize: wp('5%') }}>Logout</Text>
+
+                    <Image
+                        source={require('./Images/logout.png')}
+                        style={{
+                            height: 25,
+                            width: 28,
+                            marginLeft: wp('2%')
+                        }}
+                    />
+
+                </TouchableOpacity>
+
+            </SafeAreaView>
+        );
+    }
+}
